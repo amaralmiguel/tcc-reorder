@@ -67,46 +67,6 @@ function salt_and_pepper_noise(noise_percent, matrix) {
     return matrix;
 }
 
-function createBinaryString(nMask) {
-    for (var nFlag = 0, nShifted = nMask, sMask = ""; nFlag < 32;
-        nFlag++, sMask += String(nShifted >>> 31), nShifted <<= 1);
-    return sMask;
-}
-
-let bits = [];
-function block_matrix(matrix, k) {
-    let block_height = Math.round(len / (math.pow(2, k))),
-        block_width = Math.round(len / k),
-        index = 0;
-
-    console.log('Colunas: ' + block_width, 'Linhas: ' + block_height)
-
-    let qtd_blocos_linha = Math.round(len / block_height);
-
-    for (let i = 0; i < qtd_blocos_linha; i++) {
-        let temp = createBinaryString(i);
-        for (let j = 0; j < k; j++) {
-            bits.push(Number(temp[temp.length - 1 - j]));
-        }
-    }
-
-    /* Loop over every cell of the matrix */
-    for (let i = 0; i < len; i++) {
-        for (let j = 0; j < len; j++) {
-            if (i % block_height == 0) {
-                matrix[i][j] = bits[index];
-                if (j != 0 && j % block_width == 0) {
-                    index++;
-                }
-            }
-            else {
-                matrix[i][j] = matrix[i - 1][j];
-            }
-        }
-    }
-    return matrix;
-}
-
 function block_reorder() {
     function noise_percent(listOfColumns) {
         let noise_array = [];
