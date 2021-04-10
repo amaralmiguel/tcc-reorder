@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <title>Polar Sort</title>
+    <script src="lib/js/d3.min.js"></script>
+    <script src="lib/js/reorder.min.js"></script>
+    <script src="lib/js/jquery-3.6.0.min.js"></script>
+    <script src="lib/js/numeric.min.js"></script>
+    <script src="src/table.js"></script>
+    <script src="src/polar_sort.js"></script>
+    <script type='text/javascript'>
+        $(document).ready(function () {
+            $("#navbar").load("index.html");
+        });
+    </script>
+</head>
+
+<body onload="get_data()">
+    <div id='navbar' class="mb-3"></div>
+    <div class="container-fluid">
+        <div class="row align-items-center ml-5">
+            <div class="col text-center ml-5">
+                <h5 class="mb-3 mt-2">
+                    Blue heatmap cells represent values
+                    closer to 0, and red cells represent
+                    values closer to 1
+                </h5>
+                <div id='matrix'></div>
+            </div>
+            <div class="col ml-n5 mr-5">
+                <h5 class="ml-3">Polar Sort parameters</h5>
+                <div class="form align-items-center">
+                    <div class="col-auto mb-3">
+                        <div class="form-check form-check-inline">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text mr-3">Matrix Pattern</div>
+                            </div>
+                            <input class="form-check-input" type="radio" name="matrix_pattern" id="band_radio"
+                                value="band" checked onclick="show_bandwidth_label(true)">
+                            <label class="form-check-label" for="band_radio">Band</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="matrix_pattern" id="circumplex_radio"
+                                value="circumplex" onclick="show_bandwidth_label(false)">
+                            <label class="form-check-label" for="circumplex_radio">Circumplex</label>
+                        </div>
+                    </div>
+                    <div class="col-auto mb-3" id="bandwidth_input">
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">Bandwidth</div>
+                            </div>
+                            <input id="b" value='0.5' type="number" min="0.1" max="2" step="0.1"
+                                onkeydown="return false" class="form-control col-3 text-center">
+                        </div>
+                    </div>
+                    <div class="col-auto mb-3">
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">Matrix dimensions (M x N)</div>
+                            </div>
+                            <input id="dimensions" value='50' type="number" min="10" max="200" step="10"
+                                onkeydown="return false" class="form-control col-3 text-center">
+                        </div>
+                    </div>
+                    <div class="col-auto mb-3">
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">Noise Percent</div>
+                            </div>
+                            <input id="noise_percent" value='0' type="number" min="0" max="50" step="1"
+                                onkeydown="return false" class="form-control col-3 text-center">
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-secondary mb-3" onclick="get_data()">Apply</button>
+                    </div>
+                    <h5 class="ml-3 mt-5">Order Options</h5>
+                    <div class="col-auto mb-3">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="order_options" id="original_radio"
+                                checked onclick="original()">
+                            <label class="form-check-label" for="original_radio">Original</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="order_options" id="polar_sort_radio"
+                                onclick="polar_sort()">
+                            <label class="form-check-label" for="polar_sort_radio">Polar Sort</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="order_options" id="shuffle_radio"
+                                onclick="shuffle()">
+                            <label class="form-check-label" for="shuffle_radio">Shuffle</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function show_bandwidth_label(flag) {
+            if (flag) {
+                document.getElementById('bandwidth_input').style.display = 'block';
+            } else {
+                document.getElementById('bandwidth_input').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+
+</html>

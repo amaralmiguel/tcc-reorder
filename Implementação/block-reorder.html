@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <title>Block Reorder</title>
+    <script src="lib/js/d3.min.js"></script>
+    <script src="lib/js/reorder.min.js"></script>
+    <script src="lib/js/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/8.1.0/math.js"></script>
+    <script src="src/table.js"></script>
+    <script src="src/block_reorder.js"></script>
+    <script type='text/javascript'>
+        $(document).ready(function () {
+            $("#navbar").load("index.html");
+        });
+    </script>
+</head>
+
+<body onload="get_data()">
+    <div id='navbar' class="mb-3"></div>
+    <div class="container-fluid">
+        <div class="row align-items-center ml-5">
+            <div class="col text-center ml-5">
+                <div id='matrix'></div>
+            </div>
+            <div class="col ml-n5 mr-5">
+                <h5 class="ml-3">Block Matrix parameters</h5>
+                <div class="form align-items-center">
+                    <div class="col-auto mb-3" id="bandwidth_input">
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">Sequence of bits</div>
+                            </div>
+                            <input id="k" value='3' type="number" min="3" max="5" step="1"
+                                onkeydown="return false" class="form-control col-3 text-center">
+                        </div>
+                    </div>
+                    <div class="col-auto mb-3">
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">Matrix dimensions (M x N)</div>
+                            </div>
+                            <input id="dimensions" value='50' type="number" min="10" max="200" step="10"
+                                onkeydown="return false" class="form-control col-3 text-center">
+                        </div>
+                    </div>
+                    <div class="col-auto mb-3">
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">Noise Percent</div>
+                            </div>
+                            <input id="noise_percent" value='0' type="number" min="0" max="50" step="1"
+                                onkeydown="return false" class="form-control col-3 text-center">
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-secondary mb-3" onclick="get_data()">Apply</button>
+                    </div>
+                    <h5 class="ml-3 mt-5">Order Options</h5>
+                    <div class="col-auto mb-3">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="order_options" id="original_radio"
+                                checked onclick="original()">
+                            <label class="form-check-label" for="original_radio">Original</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="order_options" id="block_reorder_radio"
+                                onclick="block_reorder()">
+                            <label class="form-check-label" for="block_reorder_radio">Block Reorder</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="order_options" id="shuffle_radio"
+                                onclick="shuffle()">
+                            <label class="form-check-label" for="shuffle_radio">Shuffle</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
