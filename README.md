@@ -4,6 +4,6 @@ Implementação de algoritmos de reordenação de matrizes em JavaScript utiliza
 -   Faça o download deste repositório em seu sistema
 -   Tenha o Node.js instalado em seu sistema
 -   No CMD, rode o comando ```npm install http-server -g```
--   Navegue até o diretório do repositório baixado e rode o comando http-server
--   Vá até o seu navegador e acesse o endereço localhost:8080. 
+-   Navegue até o diretório do repositório baixado e rode o comando ```http-server```
+-   Vá até o seu navegador e acesse o endereço ```localhost:8080```. 
 -   As páginas de visualização/reordenação das matrizes estarão acessíveis através da navbar.
