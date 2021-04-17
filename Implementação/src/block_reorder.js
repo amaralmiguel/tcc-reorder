@@ -11,8 +11,16 @@ function get_data() {
 function block_builder(data) {
     var k = parseInt(data.k),
         dimensions = parseInt(data.dimensions),
-        noise_percent = parseFloat(data.noise_percent);
+        noise_percent = parseFloat(data.noise_percent),
+        value,
+        bitPattern,
+        patternColumn,
+        numberOfRows = dimensions,
+        numberOfColumns = dimensions,
+        blockHeight = numberOfRows / Math.pow(2, k),
+        blockWidth = numberOfColumns / k;
 
+    console.log('blockHeight:', blockHeight, 'blockWidth:', blockWidth);
     margin = { top: 30, right: 0, bottom: 0, left: 30 },
         width = 800 - margin.left - margin.right,
         height = 800 - margin.top - margin.bottom;
@@ -24,32 +32,20 @@ function block_builder(data) {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    matrix = reorder.random_matrix(0, 16, 16),
-        len = matrix.length;
+    matrix = reorder.random_matrix(0, numberOfRows, numberOfColumns), len = matrix.length;
 
-    //matrix = block_matrix(matrix, k);
+    for (let i = 0; i < numberOfRows; i++) {
+        bitPattern = parseInt((i / blockHeight));
+        for (let j = 0; j < numberOfColumns; j++) {
+            patternColumn = parseInt((j / blockWidth));
+            value = (bitPattern & parseInt(Math.pow(2, patternColumn))) > 0 ? 1 : 0;
+            matrix[i][j] = value;
+        }
+    }
 
-    matrix = [
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-        [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
-        [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1],
-        [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-        [1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0],
-        [1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    ];
-
-    matrix = reorder.permutetranspose(matrix, reorder.permutation(len).reverse());
-
+    //matrix = reorder.permute(matrix, reorder.randomPermutation(len));
+    //matrix = reorder.permutetranspose(matrix, reorder.randomPermutation(len));
+    
     noise_percent > 0 ? matrix = salt_and_pepper_noise(noise_percent, matrix) : matrix;
 
     table({ matrix: matrix, method: 'block-reorder' });
@@ -68,92 +64,134 @@ function salt_and_pepper_noise(noise_percent, matrix) {
 }
 
 function block_reorder() {
-    function noise_percent(listOfColumns) {
-        let noise_array = [];
-
-        for (column of listOfColumns) {
-            let numberZeros = 0;
-
-            for (cell of column) {
-                cell >= 0.5 ? numberZeros : numberZeros++;
-            }
-
-            noise_array.push(Math.abs((numberZeros - (column.length / 2))) / column.length);
-        }
-        return noise_array;
-    }
-
-    function simple_matching(pivot, listOfColumns) {
-        let match_array = [];
-
-        for (column of listOfColumns) {
-            let v = i = 0.0;
-
-            for (cell of column) {
-                cell == pivot[i] ? v += 1 : v;
-                i++;
-            }
-            match_array.push(v /= column.length);
-        }
-        return match_array;
-    }
-
-    function optimal(numberOfSisters, listOfColumns) {
-        let optimal = [];
-        for (index in matrix) {
-            let qtdZeros = 0;
-            for (col of listOfColumns.slice(0, numberOfSisters)) {
-                if ((col[index] >= 0.5) == false) {
-                    qtdZeros++;
-                }
-            }
-            optimal.push(qtdZeros < numberOfSisters / 2 ? 1 : 0);
-        }
-
-        return optimal;
-    }
+    var numberOfColumns = matrix[0].length,
+        numberOfRows = matrix.length,
+        orderOfColumns = [],
+        optimals = [];
 
     const SISTERHOOD_BOUNDARY = 0.6;
-    var optimals = [], // Lista de colunas ótimas
-        listOfColumns = reorder.transpose(matrix), // Lista de colunas da matriz
-        Clinha = [], // Lista de colunas ordenadas da matriz
-        orderOfColumns = [];
 
-    while (listOfColumns.length != 0) {
+    var columns = [];
+
+    for (let i = 0; i < numberOfColumns; ++i) {
+        var col = { 'list': [], 'noise': null, 'similarity': null, 'index': i },
+            numberZeros = 0;
+
+        for (let j = 0; j < numberOfRows; ++j) {
+            let cellVal = matrix[j][i],
+                boolVal = (cellVal >= 0.5);
+            col.list.push(boolVal);
+
+            if (!boolVal) {
+                numberZeros++;
+            }
+        }
+        col.noise = Math.abs((parseFloat(numberZeros - (col.list.length / 2)))) / col.list.length;
+        columns.push(col);
+    }
+
+    function NOISE_RANK(columns) {
+        let NOISE_LIST = [];
+        for (col of columns) {
+            NOISE_LIST.push(col.noise);
+        }
+        return reorder.sort_order(NOISE_LIST);
+    }
+
+    function SIMILARITY_RANK(columns) {
+        let SIMILARITY_LIST = [];
+        for (col of columns) {
+            SIMILARITY_LIST.push(col.similarity);
+        }
+        return reorder.sort_order_descending(SIMILARITY_LIST);
+    }
+
+    while (columns.length != 0) {
         // Coluna pivô atual de C
-        var pivot = listOfColumns[noise_percent(listOfColumns).indexOf(Math.min(...noise_percent(listOfColumns)))];
+        columns = reorder.permute(columns, NOISE_RANK(columns));
+        var pivot = columns[0];
 
-        // Reordene C com base na similaridade com p
-        listOfColumns = reorder.permute(listOfColumns, reorder.sort_order_descending(simple_matching(pivot, listOfColumns)));
+        /* calc similarity */
+        for (col of columns) {
+            if (JSON.stringify(col) == JSON.stringify(pivot)) {
+                col.similarity = 1.0;
+            } else {
+                col.similarity = 0.0;
+                for (let j = 0; j < col.list.length; ++j) {
+                    if (pivot.list[j] == col.list[j]) {
+                        col.similarity += 1;
+                    }
+                }
+                col.similarity /= col.list.length;
+            }
+        }
+
+        // Reordena as colunas com base na similaridade com a pivot
+        columns = reorder.permute(columns, SIMILARITY_RANK(columns));
 
         // Colunas irmãs de p
-        var numberOfSisters = simple_matching(pivot, listOfColumns).filter(similarity => similarity >= SISTERHOOD_BOUNDARY).length;
-        var I = listOfColumns.filter((cell, index) => index < numberOfSisters);
-        for (index in reorder.transpose(matrix)) {
-            for (column of I) {
-                if (JSON.stringify(reorder.transpose(matrix)[index]) == JSON.stringify(column)) {
-                    orderOfColumns.push(parseInt(index));
+        var numberOfSisters = columns.filter((col) => (col.similarity >= SISTERHOOD_BOUNDARY)).length;
+
+        // Construindo o col perm
+        for (col of columns.slice(0, numberOfSisters)) {
+            orderOfColumns.push(col.index);
+        }
+
+        // Coluna ótima, baseada em I
+        var optimal = [];
+        for (let i = 0; i < numberOfRows; ++i) {
+            var numberOfZeros = 0;
+            for (col of columns.slice(0, numberOfSisters)) {
+                if (!col.list[i]) {
+                    numberOfZeros++;
+                }
+            }
+            optimal.push(numberOfZeros < numberOfSisters / 2 ? false : true);
+        }
+
+        optimals.push(optimal);
+
+        // Retira de C as colunas irmãs
+        columns.splice(0, numberOfSisters);
+    }
+        
+    matrix = reorder.permutetranspose(matrix, orderOfColumns.reverse());
+    //table.order(reorder.permutation(len),  orderOfColumns.reverse());
+    var rowPerm = [];
+    for (optimal of optimals.reverse()) {
+        for (let i = 1; i < numberOfRows; ++i) {
+            for (let j = i; j > 0; --j) {
+                if (optimal[j] && !optimal[j - 1]) {
+                    for (auxOptimal of optimals) {
+                        console.log(auxOptimal)
+                        let temp = auxOptimal[j];
+                        auxOptimal[j] = auxOptimal[j - 1];
+                        auxOptimal[j - 1] = temp;
+                    }
+                    
+                    let temp = matrix[j];
+                    matrix[j] = matrix[j-1];
+                    matrix[j - 1] = temp;
+                    
+                    // let temp = d3.select("#row"+j).attr("transform");
+                    // d3.select("#row"+j).attr("transform", d3.select("#row"+(j-1)).attr("transform"));
+                    // d3.select("#row"+(j-1)).attr("transform", temp);
+                } else {
                     break;
                 }
             }
         }
-        // Coluna ótima, baseada em I
-        optimals.push(optimal(numberOfSisters, listOfColumns));
-
-        // Insira em C' os elementos pertencentes a I
-        Clinha = Clinha.concat(I);
-
-        // Retire de C os elementos pertencentes a I
-        listOfColumns.splice(0, numberOfSisters);
     }
 
-    table.order(reorder.permutation(len), orderOfColumns.reverse());
+    d3.select("svg").remove();
+    svg = d3.select("#matrix").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    for (optimal of optimals) {
-        table.order(reorder.sort_order(optimal), orderOfColumns.reverse())
-    }
+    table({ matrix: matrix, col_labels: orderOfColumns.reverse(), method: 'block-reorder' });
 }
-
 
 function shuffle() {
     var rowPerm = reorder.randomPermutation(matrix.length),
