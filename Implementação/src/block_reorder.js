@@ -43,8 +43,8 @@ function block_builder(data) {
         }
     }
 
-    //matrix = reorder.permute(matrix, reorder.randomPermutation(len));
-    //matrix = reorder.permutetranspose(matrix, reorder.randomPermutation(len));
+    matrix = reorder.permute(matrix, reorder.randomPermutation(len));
+    matrix = reorder.permutetranspose(matrix, reorder.randomPermutation(len));
     
     noise_percent > 0 ? matrix = salt_and_pepper_noise(noise_percent, matrix) : matrix;
 
@@ -157,13 +157,11 @@ function block_reorder() {
         
     matrix = reorder.permutetranspose(matrix, orderOfColumns.reverse());
     //table.order(reorder.permutation(len),  orderOfColumns.reverse());
-    var rowPerm = [];
     for (optimal of optimals.reverse()) {
         for (let i = 1; i < numberOfRows; ++i) {
             for (let j = i; j > 0; --j) {
                 if (optimal[j] && !optimal[j - 1]) {
                     for (auxOptimal of optimals) {
-                        console.log(auxOptimal)
                         let temp = auxOptimal[j];
                         auxOptimal[j] = auxOptimal[j - 1];
                         auxOptimal[j - 1] = temp;
@@ -191,6 +189,8 @@ function block_reorder() {
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     table({ matrix: matrix, col_labels: orderOfColumns.reverse(), method: 'block-reorder' });
+
+    console.log(rowPerm)
 }
 
 function shuffle() {
