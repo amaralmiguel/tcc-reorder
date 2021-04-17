@@ -15,7 +15,7 @@ function table(data) {
 		for (i = 0; i < n; i++)
 			row_labels[i] = i + 1;
 	}
-	
+
 	if (!col_labels) {
 		col_labels = Array(m);
 		for (i = 0; i < m; i++)
@@ -134,5 +134,9 @@ function table(data) {
 
 	table.order = order;
 	table.matrix = matrix;
+
+	for (cell of document.getElementsByTagName('rect')) {
+		cell.style.stroke = cell.style.fill
+	}
 }
 
