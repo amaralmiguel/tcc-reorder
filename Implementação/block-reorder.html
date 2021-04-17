@@ -58,20 +58,10 @@
                     </div>
                     <h5 class="ml-3 mt-5">Order Options</h5>
                     <div class="col-auto mb-3">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="order_options" id="original_radio"
-                                checked onclick="original()">
-                            <label class="form-check-label" for="original_radio">Original</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="order_options" id="block_reorder_radio"
-                                onclick="block_reorder()">
-                            <label class="form-check-label" for="block_reorder_radio">Block Reorder</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="order_options" id="shuffle_radio"
-                                onclick="shuffle()">
-                            <label class="form-check-label" for="shuffle_radio">Shuffle</label>
+                        <div class="row">
+                            <button type="button" class="ml-3 btn btn-secondary btn-sm" onclick="original()">Original</button>
+                            <button type="button" class="ml-2 btn btn-secondary btn-sm" onclick="block_reorder()">Block Reorder</button>
+                            <button type="button" class="ml-2 btn btn-secondary btn-sm" onclick="shuffle()">Shuffle</button>
                         </div>
                     </div>
                 </div>
