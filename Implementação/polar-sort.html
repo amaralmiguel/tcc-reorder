@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <title>Polar Sort</title>
+    <script src="lib/js/d3.min.js"></script>
+    <script src="lib/js/reorder.min.js"></script>
+    <script src="lib/js/jquery-3.6.0.min.js"></script>
+    <script src="lib/js/numeric.min.js"></script>
+    <script src="src/table.js"></script>
+    <script src="src/reorderable-matrix.js"></script>
+    <script type='text/javascript'>
+        $(document).ready(function () {
+            $("#navbar").load("index.html");
+        });
+    </script>
+</head>
+
+<body onload="reorderableMatrixParams(false)">
+    <div id='navbar' class="mb-3"></div>
+    <div class="container-fluid">
+        <div class="row align-items-center ml-5">
+            <div class="col text-center ml-5">
+                <h5 class="mb-3 mt-2">
+                    Blue heatmap cells represent values
+                    closer to 0, and red cells represent
+                    values closer to 1
+                </h5>
+                <div id='matrix'></div>
+            </div>
+            <div class="col ml-n5 mr-5">
+                <h5 class="ml-3">Polar Sort parameters</h5>
+                <form id="params">
+                    <div class="form align-items-center">
+                        <div class="col-auto mb-n2">
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend h-100">
+                                    <div class="input-group-text">Matrix Pattern</div>
+                                </div>
+                                <div class="form-group">
+                                    <select class="form-control" onchange="hideParamB(this)">
+                                        <option value="band" selected>Band Matrix</option>
+                                        <option value="circumplex">Circumplex Matrix</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-auto mb-3" id="bandwidth_input">
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">Bandwidth</div>
+                                </div>
+                                <input id="paramB" value='0.5' type="number" min="0.1" max="2" step="0.1"
+                                    onkeydown="return false" class="form-control col-1 text-center">
+                            </div>
+                        </div>
+                        <div class="col-auto mb-3">
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">Matrix dimensions (Rows x Cols)</div>
+                                </div>
+                                <input id="rows" value='50' type="number" min="10" max="200" step="10"
+                                    onkeydown="return false" class="form-control col-1 text-center">
+                                <input id="cols" value='50' type="number" min="10" max="200" step="10"
+                                    onkeydown="return false" class="form-control col-1 text-center">
+                            </div>
+                        </div>
+                        <div class="col-auto mb-3">
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">Noise Density</div>
+                                </div>
+                                <input id="noiseDensity" value='0' type="number" min="0" max="1" step="0.01"
+                                    onkeydown="return false" class="form-control col-2 text-center">
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-secondary mb-3"
+                                onclick="reorderableMatrixParams(false)">Apply</button>
+                        </div>
+                        <h5 class="ml-3 mt-5">Order Options</h5>
+                        <div class="col-auto mb-3">
+                            <div class="row">
+                                <button type="button" class="ml-3 btn btn-secondary btn-sm"
+                                    onclick="instance.originalMatrixOrder()">Original</button>
+                                <button type="button" class="ml-2 btn btn-secondary btn-sm"
+                                    onclick="instance.polarSort()">Polar Sort</button>
+                                <button type="button" class="ml-2 btn btn-secondary btn-sm"
+                                    onclick="instance.shuffleMatrix()">Shuffle</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        function hideParamB(element) {
+            console.log(element.value == 'circumplex')
+            if (element.value == 'circumplex') {
+                document.getElementById('bandwidth_input').style.display = "none";
+            } else {
+                document.getElementById('bandwidth_input').style.display = "block";
+            }
+        }
+    </script>
+</body>
+
+</html>
