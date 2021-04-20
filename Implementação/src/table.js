@@ -8,7 +8,7 @@ function table(data) {
 		n = matrix.length,
 		m = matrix[0].length,
 		i,
-		method = data.method;
+		isBinary = data.isBinary;
 
 	if (!row_labels) {
 		row_labels = Array(n);
@@ -34,18 +34,14 @@ function table(data) {
 	var max_value = d3.max(matrix.map(function (row) { return d3.max(row); })),
 		min_value = d3.min(matrix.map(function (row) { return d3.min(row); }));
 
-	switch (method) {
-		case 'block-reorder':
-			var colors = d3.scale.linear()
-				.range(['#000', '#00FFFF'])
-				.domain([min_value, max_value]);
-			break;
-
-		default:
-			var colors = d3.scale.linear()
-				.range(['#00F', '#FFF', '#F00'])
-				.domain([min_value, ((min_value + max_value) / 2), max_value]);
-			break;
+	if (isBinary) {
+		var colors = d3.scale.linear()
+			.range(['#000', '#00FFFF'])
+			.domain([min_value, max_value]);
+	} else {
+		var colors = d3.scale.linear()
+			.range(['#00F', '#FFF', '#F00'])
+			.domain([min_value, ((min_value + max_value) / 2), max_value]);
 	}
 
 	var gridSize = Math.min(width / matrix.length, height / matrix[0].length),

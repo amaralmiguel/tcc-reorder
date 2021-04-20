@@ -7,7 +7,7 @@
     <script src="lib/js/reorder.min.js"></script>
     <script src="lib/js/jquery-3.6.0.min.js"></script>
     <script src="src/table.js"></script>
-    <script src="src/fvs.js"></script>
+    <script src="src/reorderable-matrix.js"></script>
     <script type='text/javascript'>
         $(document).ready(function () {
             $("#navbar").load("index.html");
@@ -15,7 +15,7 @@
     </script>
 </head>
 
-<body onload="get_data()">
+<body onload="reorderableMatrixParams(false)">
     <div id='navbar' class="mb-3"></div>
     <div class="container-fluid">
         <div class="row align-items-center ml-5">
@@ -29,61 +29,67 @@
             </div>
             <div class="col ml-n5 mr-5">
                 <h5 class="ml-3">FVS parameters</h5>
-                <div class="form align-items-center">
-                    <div class="col-auto mb-3">
-                        <div class="form-check form-check-inline">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text mr-3">Matrix Pattern</div>
+                <form id="params">
+                    <div class="form align-items-center">
+                        <div class="col-auto mb-n2">
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend h-100">
+                                    <div class="input-group-text">Matrix Pattern</div>
+                                </div>
+                                <div class="form-group">
+                                    <select class="form-control">
+                                        <option value="equi" selected>Equi Matrix</option>
+                                        <option value="simplex">Simplex Matrix</option>
+                                    </select>
+                                </div>
                             </div>
-                            <input class="form-check-input" type="radio" name="matrix_pattern" id="simplex_radio"
-                                value="equi" checked>
-                            <label class="form-check-label" for="simplex_radio">Simplex</label>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="matrix_pattern" id="equi_radio"
-                                value="simplex">
-                            <label class="form-check-label" for="equi_radio">Equi</label>
-                        </div>
-                    </div>
-                    <div class="col-auto mb-3">
-                        <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text">Smoothness / Scale</div>
+                        <div class="col-auto mb-3">
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">Smoothness / Scale</div>
+                                </div>
+                                <input id="paramB" value='0.5' type="number" min="0.1" max="2" step="0.1"
+                                    onkeydown="return false" class="form-control col-1 text-center">
                             </div>
-                            <input id="b" value='0.5' type="number" min="0.1" max="2" step="0.1"
-                                onkeydown="return false" class="form-control col-3 text-center">
                         </div>
-                    </div>
-                    <div class="col-auto mb-3">
-                        <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text">Matrix dimensions (M x N)</div>
+                        <div class="col-auto mb-3">
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">Matrix dimensions (Rows x Cols)</div>
+                                </div>
+                                <input id="rows" value='50' type="number" min="10" max="200" step="10"
+                                    onkeydown="return false" class="form-control col-1 text-center">
+                                <input id="cols" value='50' type="number" min="10" max="200" step="10"
+                                    onkeydown="return false" class="form-control col-1 text-center">
                             </div>
-                            <input id="dimensions" value='50' type="number" min="10" max="200" step="10"
-                                onkeydown="return false" class="form-control col-3 text-center">
                         </div>
-                    </div>
-                    <div class="col-auto mb-3">
-                        <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text">Noise Percent</div>
+                        <div class="col-auto mb-3">
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">Noise Density</div>
+                                </div>
+                                <input id="noiseDensity" value='0' type="number" min="0" max="1" step="0.01"
+                                    onkeydown="return false" class="form-control col-2 text-center">
                             </div>
-                            <input id="noise_percent" value='0' type="number" min="0" max="50" step="1"
-                                onkeydown="return false" class="form-control col-3 text-center">
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-secondary mb-3"
+                                onclick="reorderableMatrixParams(false)">Apply</button>
+                        </div>
+                        <h5 class="ml-3 mt-5">Order Options</h5>
+                        <div class="col-auto mb-3">
+                            <div class="row">
+                                <button type="button" class="ml-3 btn btn-secondary btn-sm"
+                                    onclick="instance.originalMatrixOrder()">Original</button>
+                                <button type="button" class="ml-2 btn btn-secondary btn-sm"
+                                    onclick="instance.fvsSort()">FVS</button>
+                                <button type="button" class="ml-2 btn btn-secondary btn-sm"
+                                    onclick="instance.shuffleMatrix()">Shuffle</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-auto">
-                        <button type="button" class="btn btn-secondary mb-3" onclick="get_data()">Apply</button>
-                    </div>
-                    <h5 class="ml-3 mt-5">Order Options</h5>
-                    <div class="col-auto mb-3">
-                        <div class="row">
-                            <button type="button" class="ml-3 btn btn-secondary btn-sm" onclick="original()">Original</button>
-                            <button type="button" class="ml-2 btn btn-secondary btn-sm" onclick="fvs_order()">FVS</button>
-                            <button type="button" class="ml-2 btn btn-secondary btn-sm" onclick="shuffle()">Shuffle</button>
-                        </div>
-                    </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
