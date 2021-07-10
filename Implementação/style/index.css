@@ -1,11 +1,15 @@
-.navbar-nav {
-    font-size: 1.5em !important;
-}
-
 body {
-    font: 10px sans-serif !important;
+    font: 14px sans-serif !important;
 }
 
 label {
     font-size: larger;
+}
+
+input[type="radio"] {
+    cursor: pointer;
+}
+
+#second-column {
+    margin-top: 8%;
 }

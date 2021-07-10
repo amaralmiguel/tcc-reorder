@@ -6,36 +6,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style/index.css">
     <link rel="stylesheet" href="lib/css/bootstrap.bundle.min.css">
+    <script src="lib/js/d3.min.js"></script>
     <script src="lib/js/jquery-3.6.0.min.js"></script>
     <script src="lib/js/bootstrap.min.js"></script>
-    <script src="lib/js/d3.min.js"></script>
     <script src="lib/js/reorder.min.js"></script>
-    <script src="src/table.js"></script>
-    <script src="src/reorderable-matrix.js"></script>
     <script src="lib/js/math.js"></script>
     <script src="lib/js/numeric.min.js"></script>
-    <title>TCC</title>
+    <script src="lib/js/sweetalert2.all.min.js"></script>
+    <script src="lib/table.js"></script>
+    <script src="src/reorderable-matrix.js"></script>
+    <script src="src/demo.js"></script>
+    <title>Trabalho de Conclusão de Curso</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 
-<body onload="reorderableMatrixParams(isBinary)">
+<body onload="createMatrix()">
     <div class="container-fluid">
         <div class="row align-items-center ml-5">
-            <div class="col text-center ml-5">
-                <h5 class="mb-3 mt-5 text-center">
-                    Blue heatmap cells represent values
-                    closer to 0, and red cells represent
-                    values closer to 1
-                </h5>
-                <div id='matrix'></div>
+            <div class="col-lg text-center ml-5">
+                <div id='matrix' class="my-5"></div>
             </div>
-            <div class="col ml-n5 mr-5">
-                <h5 class="ml-3">Set parameters</h5>
-                <form id="params">
+
+            <div class="col-lg ml-n5 mr-5 border-left mb-5" id="second-column">
+                <h5 class="ml-3">Matrix Options</h5>
+                <div class="row ml-0 mb-3">
+                    <div class="col-4">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <input type="radio" name="set-matrix" id="new-matrix" checked>
+                                </div>
+                            </div>
+                            <p class="form-control">Create a new one</p>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <input type="radio" name="set-matrix" id="real-world-data">
+                                </div>
+                            </div>
+                            <p class="form-control">Real World Data</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col border-bottom my-3 mx-3" style="max-width: 64.2%"></div>
+
+                <!-- Formulário para definir os parâmetros ao criar uma nova matriz -->
+                <form id="new-matrix-form">
                     <div class="form align-items-center">
                         <div class="col-auto mb-n2">
                             <div class="input-group mb-2">
                                 <div class="input-group-prepend h-100">
-                                    <div class="input-group-text">Matrix Pattern</div>
+                                    <div class="input-group-text">Cannonical Pattern</div>
                                 </div>
                                 <div class="form-group">
                                     <select id="matrixPattern" class="form-control" onchange="changeParamB(this)">
@@ -53,8 +78,7 @@
                                 <div class="input-group-prepend">
                                     <div class="input-group-text" id="paramB_label">Smoothness / Scale</div>
                                 </div>
-                                <input id="paramB" value='0.5' type="number" min="0.1" max="2" step="0.1"
-                                    onkeydown="return false" class="form-control col-1 text-center">
+                                <input id="paramB" value='0.5' class="form-control col-1 text-center">
                             </div>
                         </div>
                         <div class="col-auto mb-3">
@@ -62,50 +86,144 @@
                                 <div class="input-group-prepend">
                                     <div class="input-group-text">Matrix dimensions (Rows x Cols)</div>
                                 </div>
-                                <input id="rows" value='50' type="number" min="10" max="200" step="10"
+                                <input id="numberRows" value='50' type="number" min="10" max="200" step="10"
                                     onkeydown="return false" class="form-control col-1 text-center">
-                                <input id="cols" value='50' type="number" min="10" max="200" step="10"
+                                <input id="numberCols" value='50' type="number" min="10" max="200" step="10"
                                     onkeydown="return false" class="form-control col-1 text-center">
                             </div>
                         </div>
                         <div class="col-7 mb-3">
                             <div class="input-group mb-2">
                                 <div class="input-group-prepend">
-                                    <div class="input-group-text">Noise Density</div>
+                                    <div class="input-group-text">Noise Level</div>
                                 </div>
-                                <input id="noiseDensity" value='0' type="number" min="0" max="1" step="0.1"
-                                    onkeydown="return false" class="form-control col-2 text-center">
+                                <input id="noiseLevel" onkeydown="return false" class="form-control col-2 text-center"
+                                    value="0" type="number" min="0" max="1" step="0.01">
+                            </div>
+                        </div>
+                        <div class="col-7 mb-3">
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">Is Binary?</div>
+                                </div>
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="radio" name="is-binary" value="true">
+                                    </div>
+                                </div>
+                                <p class="form-control col-2">Yes</p>
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="radio" name="is-binary" value="false" checked>
+                                    </div>
+                                </div>
+                                <p class="form-control col-2">No</p>
                             </div>
                         </div>
                         <div class="col-auto">
-                            <button type="button" class="btn btn-secondary mb-3"
-                                onclick="reorderableMatrixParams(isBinary); checkOrderBtn()">Apply</button>
-                        </div>
-                        <h5 class="ml-3 mt-5">Order Options</h5>
-                        <div class="col-auto mb-3">
-                            <div class="row">
-                                <button type="button" class="ml-3 btn btn-secondary btn-sm"
-                                    onclick="instance.originalMatrixOrder()">Original</button>
-                                <button type="button" class="ml-2 btn btn-secondary btn-sm"
-                                    onclick="instance.shuffleMatrix()">Shuffle</button>
-                                <button id="fvsOrderBtn" type="button" class="ml-2 btn btn-secondary btn-sm"
-                                    onclick="instance.fvsSort()">FVS</button>
-                                <button id="polarOrderBtn" type="button" class="ml-2 btn btn-secondary btn-sm"
-                                    onclick="instance.polarSort()">Polar Sort</button>
-                                <button id="blockOrderBtn" type="button" class="ml-2 btn btn-secondary btn-sm"
-                                    onclick="instance.blockSort()">Block Reorder</button>
-                            </div>
+                            <button type="button" class="btn btn-secondary mb-3" onclick="createMatrix()">Apply</button>
                         </div>
                     </div>
                 </form>
+
+                <!-- Formulário para escolher um dos exemplos de uma matriz do mundo real -->
+                <form id="real-world-data-form" class="d-none">
+                    <div class="col-auto mb-n2">
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend h-100">
+                                <div class="input-group-text">Example</div>
+                            </div>
+                            <div class="form-group">
+                                <select class="form-control" id="selectedExample">
+                                    <option value="circumplexExample" selected>Circumplex Example</option>
+                                    <option value="simplexExample">Simplex Example</option>
+                                    <option value="blockExample">Block Example</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-secondary my-2" onclick="realWorldData()">Apply</button>
+                    </div>
+                </form>
+
+                <!-- Opções de reordenação -->
+                <h5 class="ml-3 mt-5">Order Options</h5>
+                <div class="row ml-0 mb-2">
+                    <div class="col-3">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <input type="radio" name="order-option" value="fvs" id="fvs" checked>
+                                </div>
+                            </div>
+                            <p class="form-control">FVS</p>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <input type="radio" name="order-option" value="polar" id="polar">
+                                </div>
+                            </div>
+                            <p class="form-control">Polar Sort</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row ml-0 mb-2">
+                    <div class="col-3">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <input type="radio" name="order-option" value="block" id="block">
+                                </div>
+                            </div>
+                            <p class="form-control">Block Reordering</p>
+                        </div>
+                    </div>
+
+                    <div class="col-3">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <input type="radio" name="order-option" value="hybrid" id="hybrid">
+                                </div>
+                            </div>
+                            <p class="form-control">Hybrid Sort</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row ml-0 mb-2">
+                    <div class="col-3">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <input type="radio" name="order-option" value="original" id="original">
+                                </div>
+                            </div>
+                            <p class="form-control">Original Order</p>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <input type="radio" name="order-option" value="shuffle" id="shuffle">
+                                </div>
+                            </div>
+                            <p class="form-control">Shuffle</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-secondary my-2" onclick="reorderMatrix()">Apply</button>
+                </div>
             </div>
         </div>
     </div>
+    </div>
     <script>
-        var isBinary = false;
-        document.getElementById('polarOrderBtn').style.display = 'none';
-        document.getElementById('blockOrderBtn').style.display = 'none';
-
         function changeParamB(element) {
             let div = document.getElementById('paramB_div'),
                 input = document.getElementById("paramB"),
@@ -123,44 +241,33 @@
                 input.min = 0.1;
                 input.max = 2;
                 input.step = 0.1;
-                isBinary = false;
             } else if (element.value == 'block') {
                 label.innerText = "Sequence of Bits (k)";
                 input.value = 3;
                 input.min = 3;
                 input.max = 7;
                 input.step = 1;
-                isBinary = true;
             } else {
                 label.innerText = "Smoothness / Scale";
                 input.value = 0.5;
                 input.min = 0.1;
                 input.max = 2;
                 input.step = 0.1;
-                isBinary = false;
             }
         }
 
-        function checkOrderBtn() {
-            let matrixPattern = document.getElementById('matrixPattern').value,
-                fvsBtn = document.getElementById('fvsOrderBtn'),
-                polarBtn = document.getElementById('polarOrderBtn'),
-                blockBtn = document.getElementById('blockOrderBtn');
-
-            if (matrixPattern == 'band' || matrixPattern == 'circumplex') {
-                fvsBtn.style.display = 'none';
-                blockBtn.style.display = 'none';
-                polarBtn.style.display = 'block';
-            } else if (matrixPattern == 'block') {
-                polarBtn.style.display = 'none';
-                fvsBtn.style.display = 'none';
-                blockBtn.style.display = 'block';
+        let swap = true;
+        $('input[name="set-matrix"]').change(function () {
+            if (swap) {
+                $('#new-matrix-form').hide();
+                $('#real-world-data-form').removeClass('d-none');
+                swap = false;
             } else {
-                polarBtn.style.display = 'none';
-                fvsBtn.style.display = 'block';
-                blockBtn.style.display = 'none';
+                $('#new-matrix-form').show();
+                $('#real-world-data-form').addClass('d-none');
+                swap = true;
             }
-        }
+        });
     </script>
 </body>
 

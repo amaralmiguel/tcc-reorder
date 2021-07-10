@@ -1,3 +1,7 @@
+/**
+ * @author Jean-Daniel Fekete
+*/
+
 function table(data) {
 	var matrix = data.matrix,
 		row_labels = data.row_labels,
@@ -7,8 +11,7 @@ function table(data) {
 		row_inv, col_inv,
 		n = matrix.length,
 		m = matrix[0].length,
-		i,
-		isBinary = data.isBinary;
+		i;
 
 	if (!row_labels) {
 		row_labels = Array(n);
@@ -31,23 +34,23 @@ function table(data) {
 	col_inv = reorder.inverse_permutation(col_perm);
 
 
-	var max_value = d3.max(matrix.map(function (row) { return d3.max(row); })),
-		min_value = d3.min(matrix.map(function (row) { return d3.min(row); }));
+	var maxVal = d3.max(matrix.map(function (row) { return d3.max(row); })),
+		minVal = d3.min(matrix.map(function (row) { return d3.min(row); })),
+		mediumVal = ((minVal + maxVal) / 2);
 
-	if (isBinary) {
-		var colors = d3.scale.linear()
-			.range(['#00F', '#F00'])
-			.domain([min_value, max_value]);
+	if ($('#selectedExample').val() == 'simplexExample') {
+		mediumVal = 0.16;
 	} else {
-		var colors = d3.scale.linear()
-			.range(['#00F', '#FFF', '#F00'])
-			.domain([min_value, ((min_value + max_value) / 2), max_value]);
+		mediumVal = ((maxVal + minVal) / 2);
 	}
 
-	var gridSize = Math.min(width / matrix.length, height / matrix[0].length),
-		h = gridSize,
+	var colors = d3.scale.linear()
+		.range(['#00F', '#FFF', '#F00'])
+		.domain([minVal, mediumVal, maxVal]);
+
+	var h = height / matrix.length,
 		th = h * n,
-		w = gridSize,
+		w = width / matrix[0].length,
 		tw = w * m;
 
 	var x = function (i) { return w * col_inv[i]; },
