@@ -1,0 +1,15 @@
+body {
+    font: 14px sans-serif !important;
+}
+
+label {
+    font-size: larger;
+}
+
+input[type="radio"] {
+    cursor: pointer;
+}
+
+#second-column {
+    margin-top: 8%;
+}
