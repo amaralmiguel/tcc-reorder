@@ -13,7 +13,7 @@ A implementação obedece a seguinte estrutura:
 - `src/table.js` arquivo originário da biblioteca reorder.js responsável por renderizar matrizes em tela, modificado para atender os requisitos deste trabalho;
 - `lib` bibliotecas utilizadas na implementação, inclusive a reorder.js.
 
-A *API* para acesso remoto ao classificador *Hybrid Sort* está na pasta `API Hybrid Sort`. A implementação do lado do servidor está no caminho: `src/main/java/ft/unicamp/apihybridsort/ApiHybridSortApplication.java`.
+A *API* para acesso remoto ao classificador *Hybrid Sort* está hospedada na plataforma *Heroku*. A implementação do lado do servidor está no arquivo  `ApiHybridSortApplication.java`.
 Para a *API*, não é necessário executar nenhum arquivo adicional.  No entanto, para classificar uma matriz em um determinado padrão canônico de dados, devem ser informados os seguintes parâmetros via requisição *POST* para o endereço `https://hybrid-sort-api.herokuapp.com/classifier`:
 - Matriz reordenável (`chave` "matrix");
 - Vetor de permutação de linhas (`chave` "rowPerm");
