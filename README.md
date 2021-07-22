@@ -5,7 +5,7 @@ Projeto desenvolvido como Trabalho de Conclusão de Curso em Sistemas de Informa
 1.   Faça o download deste repositório em seu sistema;
 2.   Na pasta raiz, abra o arquivo index.html.
 
-    Será aberto uma nova página no navegador, mostrando as matrizes reordenáveis e as formas de interação.
+    Será aberta uma nova página no navegador, mostrando as matrizes reordenáveis e as formas de interação.
 
 A implementação obedece a seguinte estrutura:
 - `src/reorderable-matrix.js` arquivo contendo a implementação dos algoritmos de reordenação de matrizes e de criação de matrizes com padrões canônicos de dados;
